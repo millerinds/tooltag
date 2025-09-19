@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gest�o�o App - Cadastro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+            position: Relat�riove;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            position: Relat�riove;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            background: white;
+            border: 2px dashed #d1d5db;
+            cursor: pointer;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: Relat�riove;
+        }
+
+        .form-group input[type="file"]:hover {
+            border-color: #3b82f6;
+            background: #f8faff;
+        }
+
+        .form-group input[type="file"].dragover {
+            border-color: #10b981;
+            background: #ecfdf5;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .drop-zone-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            color: #6b7280;
+            pointer-events: none;
+        }
+
+        .drop-zone-text.dragover {
+            color: #065f46;
+            font-weight: bold;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .tipo-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tipo-option {
+            position: Relat�riove;
+        }
+
+        .tipo-option input[type="radio"] {
+            display: none;
+        }
+
+        .tipo-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .tipo-option input[type="radio"]:checked + label {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            color: #1e40af;
+            transform: scale(1.02);
+        }
+
+        .composicao-section {
+            display: none;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .composicao-section.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .composicao-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+
+        .composicao-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .composicao-item input[readonly] {
+            background: #e5e7eb;
+            cursor: default;
+        }
+
+        .add-composicao-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-composicao-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .composicao-iN�o {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #0284c7;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #0c4a6e;
+        }
+
+        .composicao-summary {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            margin-top: 20px;
+        }
+
+        .composicao-summary h4 {
+            color: #374151;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .composicao-list {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .search-container {
+            position: Relat�riove;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .search-result-item.no-results {
+            color: #6b7280;
+            cursor: default;
+        }
+
+        .search-result-item.no-results:hover {
+            background: none;
+        }
+
+        .flash-messages {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 500;
+            animation: slideUp 0.3s ease forwards, fadeOut 5s ease 2s forwards;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .flash-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .flash-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .flash-message.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+        }
+
+        .click-effect {
+            animation: clickPulse 0.3s ease;
+        }
+
+        @keyframes clickPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-iN�out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tipo-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .composicao-item {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .submit-btn,
+            .back-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .flash-messages {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+            }
+
+            .flash-message {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .form-group input[type="file"] {
+                height: 80px;
+            }
+        }
+    </style>
+    <style>
+        /* Overrides para corrigir alinhamentos e anima��o (UTF-8) */
+        .form-container,
+        .form-group,
+        .form-group input[type="file"],
+        .tipo-option,
+        .search-container { position: relative !important; }
+        .loading-spinner { animation: spin 1s ease-in-out infinite !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Cadastro</h1>
+            <p>Cadastre ferramentas e insumos para o sistema</p>
+        </div>
+
+        <div class="form-container">
+            <form id="cadastroForm" method="POST" enctype="multipart/form-data" autocomplete="off">
+                <div class="form-section">
+                    <div class="section-title">Tipo do Item <span class="required">*</span></div>
+                    <div class="tipo-selector">
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo_ferramenta" name="tipo_item" value="ferramenta" required>
+                            <label for="tipo_ferramenta">🔧 Ferramenta</label>
+                        </div>
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo_insumo" name="tipo_item" value="insumo" required>
+                            <label for="tipo_insumo">📦 Insumo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">IN�orma��es�ões Básicas</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="codigo_fabricacao">Código de Fabricação</label>
+                            <input type="text" id="codigo_fabricacao" name="codigo_fabricacao" placeholder="Ex: FAB001">
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_interno">Código Interno <span class="required">*</span></label>
+                            <input type="text" id="codigo_interno" name="codigo_interno" required placeholder="Ex: INT001">
+                            <small id="codigo-feedback" style="color: #6b7280; font-size: 12px;"></small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="nome_Descri��oao">Nome/Descri��o�ão <span class="required">*</span></label>
+                            <input type="text" id="nome_Descri��oao" name="nome_Descri��oao" required placeholder="Ex: Broca HSS 6mm">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="foto">Foto (Opcional)</label>
+                            <input type="file" id="foto" name="foto" accept="image/*" aria-Descri��oedby="foto-help">
+                            <span class="drop-zone-text">Arraste e solte uma imagem aqui ou clique para selecionar</span>
+                            <small id="foto-help" style="color: #6b7280; font-size: 12px;">Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (máx. 16MB)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Especificações</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="categoria">Categoria</label>
+                            <input type="text" id="categoria" name="categoria" placeholder="Ex: Desbaste, AcabameN�o">
+                        </div>
+                        <div class="form-group">
+                            <label for="material">Material</label>
+                            <input type="text" id="material" name="material" placeholder="Ex: HSS, Metal Duro">
+                        </div>
+                        <div class="form-group" id="ferramenta-tipo-container" style="display: none;">
+                            <label for="ferramenta_tipo">Tipo de Ferramenta <span class="required">*</span></label>
+                            <select id="ferramenta_tipo" name="ferramenta_tipo">
+                                <option value="" disabled selected>Selecione o tipo</option>
+                                <option value="torno">Torno</option>
+                                <option value="centro_usinagem">Centro de Usinagem</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Parâmetros Internos</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="altura_min">Altura Mínima (mm)</label>
+                            <input type="number" id="altura_min" name="altura_min" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="altura_max">Altura Máxima (mm)</label>
+                            <input type="number" id="altura_max" name="altura_max" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="rpm">RPM</label>
+                            <input type="number" id="rpm" name="rpm" min="0" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="avaN�o">Avanço (mm/min)</label>
+                            <input type="number" id="avaN�o" name="avaN�o" step="0.01" min="0" placeholder="0.10">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="composicao-section" class="composicao-section">
+                    <div class="section-title">Composição da Ferramenta</div>
+                    <div class="composicao-iN�o">
+                        <strong>ℹ️ IN�orma��es�ão:</strong> Pesquise insumos pelo código interno e clique para adicioná-los à composição com suas quantidades.
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="insumo-search" placeholder="Pesquisar insumo por código interno (ex: INT001)">
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                    <div id="composicao-items"></div>
+                    <div class="composicao-summary" id="composicao-summary" style="display: none;">
+                        <h4>Resumo da Composição:</h4>
+                        <div class="composicao-list" id="composicao-list"></div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn" id="submitBtn" onclick="addClickEffect(this)">
+                        Cadastrar Item
+                    </button>
+                    <button type="button" class="back-btn" onclick="handleBack(this)">
+                        Voltar
+                    </button>
+                </div>
+            </form>
+            <div id="flash-messages" class="flash-messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let insumosDisponiveis = [];
+        let composicaoCounter = 0;
+        let isCodigoInternoValid = false;
+
+        // Carrega insumos disponíveis ao iniciar
+        async function loadInsumos() {
+            try {
+                const response = await fetch('/api/insumos_cadastro');
+                if (response.ok) {
+                    insumosDisponiveis = await response.json();
+                    coN�ole.log(`${insumosDisponiveis.length} insumos carregados`);
+                    updateSearchResults('');
+                } else {
+                    coN�ole.error('Erro ao carregar insumos:', response.statusText);
+                    showFlashMessage('Erro ao carregar lista de insumos', 'warning');
+                    insumosDisponiveis = [];
+                }
+            } catch (error) {
+                coN�ole.error('Erro ao carregar insumos:', error);
+                showFlashMessage('Erro de conexão ao carregar insumos', 'error');
+                insumosDisponiveis = [];
+            }
+        }
+
+        // Verifica se o código interno já existe
+        async function checkCodigoInterno(codigo) {
+            if (!codigo || typeof codigo !== 'string' || codigo.trim() === '') {
+                return { exists: false, error: 'Código interno inválido' };
+            }
+            try {
+                const response = await fetch(`/api/verificar_codigo_interno?codigo=${eN�odeURIComponent(codigo)}`);
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                return { exists: data.exists, error: null };
+            } catch (error) {
+                coN�ole.error('Erro ao verificar código interno:', error.message);
+                return { exists: false, error: error.message };
+            }
+        }
+
+        // Atualiza os resultados da pesquisa
+        function updateSearchResults(searchTerm) {
+            const searchResults = document.getElementById('search-results');
+            const filteredInsumos = searchTerm
+                ? insumosDisponiveis.filter(insumo =>
+                      insumo.codigo_interno.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                : insumosDisponiveis;
+
+            if (filteredInsumos.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item no-results">Nenhum insumo eN�ontrado</div>';
+            } else {
+                searchResults.innerHTML = filteredInsumos.map(insumo => `
+                    <div class="search-result-item" onclick="addInsumoToComposicao(${insumo.id}, '${insumo.codigo_interno}', '${insumo.nome_Descri��oao.replace(/'/g, "\\'")}')">
+                        ${insumo.codigo_interno} - ${insumo.nome_Descri��oao}
+                    </div>
+                `).join('');
+            }
+            searchResults.classList.add('show');
+        }
+
+        // Adiciona insumo à composição
+        function addInsumoToComposicao(id, codigo, nome) {
+            const selectedInsumos = Array.from(document.querySelectorAll('input[name="composicao_insumos"]')).map(input => input.value);
+            if (selectedInsumos.includes(id.toString())) {
+                showFlashMessage('Este insumo já foi adicionado à composição', 'error');
+                return;
+            }
+
+            const container = document.getElementById('composicao-items');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'composicao-item';
+            itemDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Insumo <span class="required">*</span></label>
+                    <input type="text" readonly value="${codigo} - ${nome}">
+                    <input type="hidden" name="composicao_insumos" value="${id}">
+                </div>
+                <div class="form-group">
+                    <label>Quantidade <span class="required">*</span></label>
+                    <input type="number" name="composicao_quantidades" min="1" value="1" required onchange="updateComposicaoSummary()">
+                </div>
+                <button type="button" class="remove-btn" onclick="removeComposicaoItem(this)" title="Remover este insumo">
+                    <span>🗑️</span> Remover
+                </button>
+            `;
+            container.appendChild(itemDiv);
+            composicaoCounter++;
+            updateComposicaoSummary();
+            document.getElementById('insumo-search').value = '';
+            updateSearchResults('');
+            document.getElementById('search-results').classList.remove('show');
+        }
+
+        // Remove item de composição
+        function removeComposicaoItem(button) {
+            if (confirm('Tem certeza que deseja remover este insumo da composição?')) {
+                button.closest('.composicao-item').remove();
+                updateComposicaoSummary();
+            }
+        }
+
+        // Atualiza o resumo da composição
+        function updateComposicaoSummary() {
+            const insumos = document.querySelectorAll('input[name="composicao_insumos"]');
+            const quantities = document.querySelectorAll('input[name="composicao_quantidades"]');
+            const summaryDiv = document.getElementById('composicao-summary');
+            const listDiv = document.getElementById('composicao-list');
+            
+            let items = [];
+            for (let i = 0; i < insumos.length; i++) {
+                const insumoInput = insumos[i];
+                const quantityInput = quantities[i];
+                const displayInput = insumoInput.parentNode.querySelector('input[readonly]');
+                
+                if (insumoInput.value && quantityInput.value && parseInt(quantityInput.value) > 0) {
+                    items.push({
+                        codigo: displayInput.value.split(' - ')[0],
+                        nome: displayInput.value.split(' - ')[1],
+                        quantidade: parseInt(quantityInput.value)
+                    });
+                }
+            }
+            
+            if (items.length > 0) {
+                listDiv.innerHTML = items.map(item => 
+                    `• ${item.quantidade}x ${item.codigo} - ${item.nome}`
+                ).join('<br>');
+                summaryDiv.style.display = 'block';
+            } else {
+                summaryDiv.style.display = 'none';
+            }
+        }
+
+        // Controla a exibição da seção de composição e do tipo de ferramenta
+        document.querySelectorAll('input[name="tipo_item"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const composicaoSection = document.getElementById('composicao-section');
+                const ferramentaTipoContainer = document.getElementById('ferramenta-tipo-container');
+                const searchInput = document.getElementById('insumo-search');
+                const ferramentaTipoSelect = document.getElementById('ferramenta_tipo');
+                
+                if (this.value === 'ferramenta') {
+                    composicaoSection.classList.add('show');
+                    ferramentaTipoContainer.style.display = 'block';
+                    ferramentaTipoSelect.setAttribute('required', 'required');
+                    if (document.getElementById('composicao-items').children.length === 0) {
+                        updateSearchResults('');
+                    }
+                } else {
+                    composicaoSection.classList.remove('show');
+                    ferramentaTipoContainer.style.display = 'none';
+                    ferramentaTipoSelect.removeAttribute('required');
+                    document.getElementById('composicao-items').innerHTML = '';
+                    searchInput.value = '';
+                    updateSearchResults('');
+                    updateComposicaoSummary();
+                    ferramentaTipoSelect.value = ''; // Resetar seleção
+                }
+            });
+        });
+
+        // Pesquisa de insumos
+        document.getElementById('insumo-search').addEventListener('input', function() {
+            const searchTerm = this.value;
+            updateSearchResults(searchTerm);
+        });
+
+        // Esconde resultados da pesquisa ao clicar fora
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.querySelector('.search-container');
+            if (!searchContainer.contains(e.target)) {
+                document.getElementById('search-results').classList.remove('show');
+            }
+        });
+
+        // Adiciona efeito de clique
+        function addClickEffect(element) {
+            element.classList.add('click-effect');
+            setTimeout(() => {
+                element.classList.remove('click-effect');
+            }, 300);
+        }
+
+        // Volta para página anterior
+        function handleBack(button) {
+            addClickEffect(button);
+            setTimeout(() => {
+                wiN�ow.location.href = '{{ url_for('index') }}';
+            }, 300);
+        }
+
+        // Mostra mensagens flash
+        function showFlashMessage(message, type) {
+            const container = document.getElementById('flash-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flash-message ${type}`;
+            messageDiv.textContent = message;
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Validação do formulário
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Previne envio padrão para validação assíncrona
+            const submitBtn = document.getElementById('submitBtn');
+            const codigoInterno = document.getElementById('codigo_interno').value.trim();
+            const nomeDescri��oao = document.getElementById('nome_Descri��oao').value.trim();
+            const tipoItem = document.querySelector('input[name="tipo_item"]:checked');
+            const ferramentaTipo = document.getElementById('ferramenta_tipo').value;
+
+            // Validações básicas
+            if (!tipoItem) {
+                showFlashMessage('Selecione o tipo do item (Ferramenta ou Insumo)', 'error');
+                return;
+            }
+
+            if (codigoInterno.length < 2) {
+                showFlashMessage('Código interno deve ter pelo menos 2 caracteres', 'error');
+                return;
+            }
+
+            if (nomeDescri��oao.length < 3) {
+                showFlashMessage('Nome/Descri��o�ão deve ter pelo menos 3 caracteres', 'error');
+                return;
+            }
+
+            // Verificar código interno duplicado
+            const result = await checkCodigoInterno(codigoInterno);
+            if (result.error) {
+                showFlashMessage(`Erro ao verificar código interno: ${result.error}`, 'error');
+                return;
+            }
+            if (result.exists) {
+                showFlashMessage('Código interno já está cadastrado', 'error');
+                return;
+            }
+
+            // Validação do tipo de ferramenta para ferramentas
+            if (tipoItem.value === 'ferramenta' && !ferramentaTipo) {
+                showFlashMessage('Selecione o tipo de ferramenta (Torno ou Centro de Usinagem)', 'error');
+                return;
+            }
+
+            // Validação de composição para ferramentas
+            if (tipoItem.value === 'ferramenta') {
+                const insumos = document.querySelectorAll('input[name="composicao_insumos"]');
+                const quantidades = document.querySelectorAll('input[name="composicao_quantidades"]');
+
+                if (insumos.length === 0) {
+                    showFlashMessage('Ferramentas devem ter pelo menos um insumo na composição', 'error');
+                    return;
+                }
+
+                let hasValidComposition = false;
+                for (let i = 0; i < insumos.length; i++) {
+                    const insumoValue = insumos[i].value;
+                    const quantidadeValue = quantidades[i] ? quantidades[i].value : '';
+                    
+                    if (insumoValue && quantidadeValue && parseInt(quantidadeValue) > 0) {
+                        hasValidComposition = true;
+                    } else if (insumoValue || quantidadeValue) {
+                        showFlashMessage('Preencha completamente todos os campos de composição ou remova itens iN�ompletos', 'error');
+                        return;
+                    }
+                }
+
+                if (!hasValidComposition) {
+                    showFlashMessage('Adicione pelo menos um insumo válido à composição da ferramenta', 'error');
+                    return;
+                }
+            }
+
+            // Validar altura min/max
+            const alturaMin = parseFloat(document.getElementById('altura_min').value || 0);
+            const alturaMax = parseFloat(document.getElementById('altura_max').value || 0);
+            
+            if (alturaMax > 0 && alturaMin > alturaMax) {
+                showFlashMessage('Altura mínima não pode ser maior que altura máxima', 'error');
+                return;
+            }
+
+            // Mostrar loading
+            submitBtn.classList.add('loading');
+            submitBtn.innerHTML = '<span class="loading-spinner"></span>CadastraN�o...';
+            submitBtn.disabled = true;
+
+            // Enviar formulário via AJAX
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/cadastro', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showFlashMessage(data.message || 'Item cadastrado com sucesso', 'success');
+                    // Limpar formulário
+                    this.reset();
+                    document.getElementById('composicao-items').innerHTML = '';
+                    document.getElementById('composicao-section').classList.remove('show');
+                    document.getElementById('ferramenta-tipo-container').style.display = 'none';
+                    document.getElementById('ferramenta_tipo').removeAttribute('required');
+                    updateComposicaoSummary();
+                    isCodigoInternoValid = false;
+                    document.getElementById('submitBtn').disabled = true;
+                    document.getElementById('foto-help').textContent = 'Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (máx. 16MB)';
+                    document.getElementById('foto-help').style.color = '#6b7280';
+                } else {
+                    showFlashMessage(data.message || 'Erro ao cadastrar item', 'error');
+                }
+            } catch (error) {
+                coN�ole.error('Erro ao enviar formulário:', error);
+                showFlashMessage('Erro de conexão ao cadastrar item', 'error');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML = 'Cadastrar Item';
+                submitBtn.disabled = !isCodigoInternoValid;
+            }
+        });
+
+        // Validação em tempo real do código interno
+        document.getElementById('codigo_interno').addEventListener('input', async function() {
+            const value = this.value.trim();
+            const feedback = document.getElementById('codigo-feedback');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (value.length < 2 && value.length > 0) {
+                feedback.textContent = 'Mínimo 2 caracteres';
+                feedback.style.color = '#ef4444';
+                isCodigoInternoValid = false;
+                submitBtn.disabled = true;
+            } else if (value.length >= 2) {
+                const result = await checkCodigoInterno(value);
+                if (result.error) {
+                    feedback.textContent = 'Erro ao verificar código';
+                    feedback.style.color = '#ef4444';
+                    isCodigoInternoValid = false;
+                    submitBtn.disabled = true;
+                    showFlashMessage(`Erro ao verificar código interno: ${result.error}`, 'error');
+                } else if (result.exists) {
+                    feedback.textContent = 'Código interno já cadastrado';
+                    feedback.style.color = '#ef4444';
+                    isCodigoInternoValid = false;
+                    submitBtn.disabled = true;
+                } else {
+                    feedback.textContent = 'Código válido';
+                    feedback.style.color = '#10b981';
+                    isCodigoInternoValid = true;
+                    submitBtn.disabled = false;
+                }
+            } else {
+                feedback.textContent = '';
+                isCodigoInternoValid = false;
+                submitBtn.disabled = true;
+            }
+        });
+
+        // Validação de arquivo de foto (seleção ou drag-and-drop)
+        function validateFile(file) {
+            const feedback = document.getElementById('foto-help');
+            const maxSize = 16 * 1024 * 1024; // 16MB
+            const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+            
+            if (!file) {
+                feedback.textContent = 'Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP (máx. 16MB)';
+                feedback.style.color = '#6b7280';
+                return false;
+            }
+
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(extension)) {
+                showFlashMessage('Formato de arquivo inválido. Use: PNG, JPG, JPEG, GIF, WEBP', 'error');
+                feedback.textContent = 'Formato inválido';
+                feedback.style.color = '#ef4444';
+                return false;
+            } else if (file.size > maxSize) {
+                showFlashMessage('Arquivo muito grande. TamaN�o máximo: 16MB', 'error');
+                feedback.textContent = 'Arquivo muito grande';
+                feedback.style.color = '#ef4444';
+                return false;
+            } else {
+                feedback.textContent = `Arquivo válido: ${file.name}`;
+                feedback.style.color = '#10b981';
+                return true;
+            }
+        }
+
+        // Configuração do drag-and-drop
+        const fileInput = document.getElementById('foto');
+        const dropZone = fileInput.parentNode;
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileInput.classList.add('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.add('dragover');
+            dropZone.querySelector('.drop-zone-text').textContent = 'Solte a imagem aqui';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileInput.classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').textContent = 'Arraste e solte uma imagem aqui ou clique para selecionar';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInput.classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').textContent = 'Arraste e solte uma imagem aqui ou clique para selecionar';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 1) {
+                showFlashMessage('Por favor, arraste apenas um arquivo por vez', 'error');
+                return;
+            }
+            if (files.length === 1) {
+                fileInput.files = files;
+                validateFile(files[0]);
+            }
+        });
+
+        // Validação ao selecionar arquivo via clique
+        fileInput.addEventListener('change', function() {
+            validateFile(this.files[0]);
+        });
+
+        // Inicialização da página
+        // Override: correcao das sugestoes de insumo na busca
+        function updateSearchResults(searchTerm) {
+            const searchResults = document.getElementById('search-results');
+            const filteredInsumos = searchTerm
+                ? insumosDisponiveis.filter(insumo =>
+                      (insumo.codigo_interno || '').toLowerCase().includes((searchTerm || '').toLowerCase())
+                  )
+                : insumosDisponiveis;
+
+            if (!Array.isArray(filteredInsumos) || filteredInsumos.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item no-results">Nenhum insumo encontrado</div>';
+            } else {
+                searchResults.innerHTML = filteredInsumos.map(insumo => {
+                    const nome = (insumo.nome_descricao || '').replace(/'/g, "\\'");
+                    return `<div class=\"search-result-item\" onclick=\"addInsumoToComposicao(${insumo.id}, '${insumo.codigo_interno}', '${nome}')\">${insumo.codigo_interno} - ${insumo.nome_descricao}</div>`;
+                }).join('');
+            }
+            searchResults.classList.add('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInsumos();
+            document.getElementById('submitBtn').disabled = true; // Botão desabilitado inicialmente
+            
+            // Animação de entrada dos elemeN�os
+            const elements = document.querySelectorAll('.form-section, .button-group');
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+    <script>
+        // Override: bot�o Voltar usa hist�rico (�ltima p�gina acessada)
+        function handleBack(button) {
+            addClickEffect(button);
+            setTimeout(() => {
+                if (document.referrer && document.referrer !== window.location.href) {
+                    window.history.back();
+                } else {
+                    window.location.href = '{{ url_for('index') }}';
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>
+

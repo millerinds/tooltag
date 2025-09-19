@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão - Redefinir Credenciais</title>
+    <style>
+        * , *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f5f7fb; margin: 0; padding: 0; overflow-x: hidden; }
+        .container { width: 92vw; max-width: 420px; margin: 6vh auto; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; padding: 18px; text-align: center; }
+        .header h1 { font-size: 18px; margin: 0; }
+        .content { padding: 20px; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 6px; }
+        input[type="text"], input[type="password"], input, select, textarea {
+            width: 100%;
+            max-width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            background: #fafbfc;
+            font-size: 16px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input:focus { outline: none; border-color: #10b981; background: #fff; box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #10b981; color: #fff; font-weight: 700; cursor: pointer; transition: all .2s ease; }
+        .btn:hover { background: #059669; transform: translateY(-1px); }
+        .error { background: #fdecea; color: #c0392b; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #f5c6cb; }
+        .success { background: #ecfdf5; color: #10643a; padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #a7f3d0; }
+        .links { display: flex; justify-content: space-between; margin-top: 12px; }
+        .links a { color: #3498db; text-decoration: none; font-weight: 600; font-size: 13px; }
+        small { color: #7f8c8d; }
+        @media (max-width: 480px) {
+            .container { width: 94vw; margin: 5vh auto; }
+            .content { padding: 16px; }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Redefinir Credenciais</h1>
+        </div>
+        <div class="content">
+            {% if error %}<div class="error">{{ error }}</div>{% endif %}
+            {% if success %}<div class="success">{{ success }}</div>{% endif %}
+            <form method="POST" action="{{ url_for('gestao_reset') }}">
+                <div class="form-group">
+                    <label for="fab_login">Login do Fabricante</label>
+                    <input type="text" id="fab_login" name="fab_login" placeholder="TOOLTAG" required>
+                    <small>Informe o login de fabricante para autorizar a alteração.</small>
+                </div>
+                <div class="form-group">
+                    <label for="fab_password">Senha do Fabricante</label>
+                    <input type="password" id="fab_password" name="fab_password" placeholder="•••••••" required>
+                </div>
+                <hr style="border: none; border-top: 1px solid #eef2f7; margin: 14px 0;">
+                <div class="form-group">
+                    <label for="new_username">Novo Usuário da Gestão</label>
+                    <input type="text" id="new_username" name="new_username" placeholder="Novo usuário" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">Nova Senha</label>
+                    <input type="password" id="new_password" name="new_password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">Atualizar</button>
+            </form>
+            <div class="links">
+                <a href="{{ url_for('login') }}">Voltar ao Login</a>
+                <a href="{{ url_for('index') }}">Ir ao Menu</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const form = document.querySelector('form[action="{{ url_for('gestao_reset') }}"]');
+                if (form) {
+                    form.setAttribute('autocomplete', 'off');
+                    form.setAttribute('novalidate', 'novalidate');
+                }
+                const fabLogin = document.getElementById('fab_login');
+                if (fabLogin) {
+                    fabLogin.value = '';
+                    fabLogin.setAttribute('placeholder', 'Login do Fabricante');
+                    fabLogin.setAttribute('autocomplete', 'off');
+                    fabLogin.setAttribute('autocapitalize', 'none');
+                    fabLogin.setAttribute('spellcheck', 'false');
+                }
+                const fabPass = document.getElementById('fab_password');
+                if (fabPass) {
+                    fabPass.value = '';
+                    fabPass.setAttribute('placeholder', 'Senha do Fabricante');
+                    fabPass.setAttribute('autocomplete', 'new-password');
+                }
+                const newUser = document.getElementById('new_username');
+                if (newUser) {
+                    newUser.value = '';
+                    newUser.setAttribute('placeholder', 'Novo usuário');
+                    newUser.setAttribute('autocomplete', 'off');
+                    newUser.setAttribute('autocapitalize', 'none');
+                    newUser.setAttribute('spellcheck', 'false');
+                }
+                const newPass = document.getElementById('new_password');
+                if (newPass) {
+                    newPass.value = '';
+                    newPass.setAttribute('placeholder', 'Nova senha');
+                    newPass.setAttribute('autocomplete', 'new-password');
+                }
+            } catch (e) { /* ignore */ }
+        });
+    </script>
+</body>
+</html>

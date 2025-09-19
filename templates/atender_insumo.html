@@ -1,0 +1,866 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atender Insumo - Gestão App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #34495e;
+            font-size: 16px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .item-codigo {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .urgencia {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .urgencia.baixa {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+
+        .urgencia.media {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 2px solid #f39c12;
+        }
+
+        .urgencia.alta {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        .urgencia.critica {
+            background: rgba(142, 68, 173, 0.1);
+            color: #8e44ad;
+            border: 2px solid #8e44ad;
+        }
+
+        .form-section {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #ecf0f1;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .photo-upload {
+            border: 3px dashed #bdc3c7;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .photo-upload.dragover {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .photo-upload h4 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .photo-upload p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .file-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .photo-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-remove:hover {
+            background: #c0392b;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            color: #856404;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .status-section {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .status-section h3 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+
+        .status-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 25px;
+            background: white;
+            border: 2px solid #27ae60;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-option:hover {
+            background: #27ae60;
+            color: white;
+        }
+
+        .status-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .status-option.selected {
+            background: #27ae60;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #34495e;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #3498db;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+
+            .info-label {
+                font-size: 12px;
+            }
+
+            .status-options {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+        }
+
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Atender Solicitação</h1>
+            <p>Processamento de solicitação de insumo</p>
+        </div>
+
+        <div class="content" id="content">
+            <div class="loading">Carregando dados da solicitação...</div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let insumoData = null;
+        let selectedFiles = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const insumoId = urlParams.get('id');
+            
+            if (!insumoId || isNaN(insumoId)) {
+                showNotification('ID de insumo inválido', 'error');
+                return;
+            }
+
+            loadInsumoData(insumoId);
+        });
+
+        function loadInsumoData(id) {
+            fetch(`/api/insumo/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    insumoData = data;
+                    renderInsumoData(data);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados:', error);
+                    showNotification(`Erro ao carregar dados: ${error.message}`, 'error');
+                    document.getElementById('content').innerHTML = `
+                        <div style="text-align: center; padding: 50px; color: #e74c3c;">
+                            <h3>Erro ao carregar solicitação</h3>
+                            <p>${error.message}</p>
+                            <button class="btn btn-back" onclick="goBack()">Voltar</button>
+                        </div>
+                    `;
+                });
+        }
+
+        function renderInsumoData(data) {
+            const content = document.getElementById('content');
+            const urgenciaClass = (data.urgencia || 'baixa').toLowerCase();
+            
+            // Buscar dados do item para obter o Código interno
+            fetch(`/api/itens_cadastro/${data.item_id}`)
+                .then(response => response.json())
+                .then(itemData => {
+                    const nomeComCodigo = `${data.nome_item || data.nome || 'N/A'} (${itemData.codigo_interno || 'Sem Código'})`;
+                    
+                    content.innerHTML = `
+                        <div class="info-section">
+                            <div class="info-row">
+                                <div class="info-label">Item Solicitado:</div>
+                                <div class="info-value item-codigo">${nomeComCodigo}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Operador:</div>
+                                <div class="info-value">${data.operador || 'N/A'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Máquina:</div>
+                                <div class="info-value">${data.maquina || 'N/A'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Quantidade:</div>
+                                <div class="info-value">${data.quantidade || 'N/A'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Urgência:</div>
+                                <div class="info-value">
+                                    <span class="urgencia ${urgenciaClass}">${data.urgencia || 'não informada'}</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Data da Solicitação:</div>
+                                <div class="info-value">${data.data || 'N/A'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Status Atual:</div>
+                                <div class="info-value">${data.status || 'Pendente'}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Justificativa:</div>
+                                <div class="info-value">${data.justificativa || 'não informada'}</div>
+                            </div>
+                        </div>
+
+                        <form id="atendimentoForm" class="form-section">
+                            <h3>InformaçÃµes de Atendimento</h3>
+                            
+                            <!-- Novo campo: Atendida por -->
+                            <div class="form-group">
+                                <label for="atendidaPor">Atendida por:</label>
+                                <input type="text" id="atendidaPor" name="atendida_por" 
+                                       placeholder="Nome de quem está atendendo a solicitação" required>
+                            </div>
+
+                            <!-- Novo campo: Observações -->
+                            <div class="form-group">
+                                <label for="observacoes">Observações do Atendimento:</label>
+                                <textarea id="observacoes" name="observacoes_atendimento" 
+                                          placeholder="Observações, comentários ou detalhes sobre o atendimento"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Fotos do Atendimento:</label>
+                                <div class="photo-upload" id="photoUpload">
+                                    <h4>Adicionar Fotos</h4>
+                                    <p>Clique para selecionar ou arraste as fotos aqui</p>
+                                    <button type="button" class="file-button" onclick="document.getElementById('photoInput').click()">
+                                        Selecionar Fotos
+                                    </button>
+                                    <input type="file" id="photoInput" class="file-input" 
+                                           accept="image/*" multiple onchange="handleFileSelect(event)">
+                                </div>
+
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="semFotos" onchange="togglePhotoRequirement()">
+                                    <label for="semFotos">não foi possível tirar fotos (marque apenas se realmente necessário)</label>
+                                </div>
+
+                                <div class="photo-preview" id="photoPreview"></div>
+                            </div>
+
+                            <div class="status-section">
+                                <h3>Status do Atendimento</h3>
+                                <div class="status-options">
+                                    <label class="status-option" onclick="selectStatus('Pendente')">
+                                        <input type="radio" name="status" value="Pendente" checked>
+                                        <span>Manter Pendente</span>
+                                    </label>
+                                    <label class="status-option" onclick="selectStatus('Atendido')">
+                                        <input type="radio" name="status" value="Atendido">
+                                        <span>Marcar como Atendido</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary">Salvar Atendimento</button>
+                                <button type="button" class="btn btn-secondary" onclick="resetForm()">Limpar Formulário</button>
+                                <button type="button" class="btn btn-back" onclick="goBack()">Voltar</button>
+                            </div>
+                        </form>
+                    `;
+
+                    setupEventListeners();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados do item:', error);
+                    // Fallback caso não consiga carregar dados do item
+                    const nomeComCodigo = `${data.nome_item || data.nome || 'N/A'} (Código não disponível)`;
+                    
+                    content.innerHTML = `
+                        <div class="info-section">
+                            <div class="info-row">
+                                <div class="info-label">Item Solicitado:</div>
+                                <div class="info-value item-codigo">${nomeComCodigo}</div>
+                            </div>
+                            <!-- Resto do conteúdo igual ao acima -->
+                        </div>
+                    `;
+                    setupEventListeners();
+                });
+        }
+
+        function setupEventListeners() {
+            const form = document.getElementById('atendimentoForm');
+            const photoUpload = document.getElementById('photoUpload');
+            
+            form.addEventListener('submit', handleSubmit);
+
+            // Drag and drop functionality
+            photoUpload.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                photoUpload.classList.add('dragover');
+            });
+
+            photoUpload.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                photoUpload.classList.remove('dragover');
+            });
+
+            photoUpload.addEventListener('drop', function(e) {
+                e.preventDefault();
+                photoUpload.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+                addFiles(files);
+            });
+        }
+
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            addFiles(files);
+            // Reset input value para permitir selecionar o mesmo arquivo novamente
+            event.target.value = '';
+        }
+
+        function addFiles(files) {
+            files.forEach(file => {
+                if (file.type.startsWith('image/') && file.size <= 16 * 1024 * 1024) { // 16MB limit
+                    selectedFiles.push(file);
+                    displayPhotoPreview(file, selectedFiles.length - 1);
+                } else {
+                    showNotification('Arquivo inválido ou muito grande (máximo 16MB)', 'error');
+                }
+            });
+        }
+
+        function displayPhotoPreview(file, index) {
+            const preview = document.getElementById('photoPreview');
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}">
+                    <button type="button" class="photo-remove" onclick="removePhoto(${index})">&times;</button>
+                `;
+                preview.appendChild(photoItem);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto(index) {
+            selectedFiles.splice(index, 1);
+            refreshPhotoPreview();
+        }
+
+        function refreshPhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                displayPhotoPreview(file, index);
+            });
+        }
+
+        function togglePhotoRequirement() {
+            const semFotos = document.getElementById('semFotos').checked;
+            const photoUpload = document.getElementById('photoUpload');
+            const photoPreview = document.getElementById('photoPreview');
+            
+            if (semFotos) {
+                photoUpload.classList.add('disabled');
+                selectedFiles = [];
+                photoPreview.innerHTML = '';
+            } else {
+                photoUpload.classList.remove('disabled');
+            }
+        }
+
+        function selectStatus(status) {
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            event.currentTarget.classList.add('selected');
+            document.querySelector(`input[name="status"][value="${status}"]`).checked = true;
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Validar campos obrigatÃ³rios
+            const atendidaPor = document.getElementById('atendidaPor').value.trim();
+            if (!atendidaPor) {
+                showNotification('Por favor, informe quem está atendendo a solicitação', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            const status = document.querySelector('input[name="status"]:checked').value;
+            const semFotos = document.getElementById('semFotos').checked;
+            const observacoes = document.getElementById('observacoes').value.trim();
+            
+            if (status === 'Atendido' && selectedFiles.length === 0 && !semFotos) {
+                showNotification('Para marcar como atendido, Ã© necessário adicionar fotos ou marcar que não foi possível tirar fotos', 'error');
+                return;
+            }
+            
+            formData.append('status', status);
+            formData.append('sem_fotos', semFotos);
+            formData.append('atendida_por', atendidaPor);
+            formData.append('observacoes_atendimento', observacoes);
+            
+            selectedFiles.forEach((file, index) => {
+                formData.append(`foto_${index}`, file);
+            });
+            
+            submitForm(formData);
+        }
+
+        function submitForm(formData) {
+            const submitButton = document.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Salvando...';
+            submitButton.disabled = true;
+            
+            fetch(`/api/insumo/${insumoData.id}/atender`, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || `HTTP ${response.status}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showNotification('Atendimento salvo com sucesso!', 'success');
+                setTimeout(() => {
+                    window.location.href = '/gestao';
+                }, 1200);
+            })
+            .catch(error => {
+                console.error('Erro ao salvar:', error);
+                showNotification(`Erro ao salvar: ${error.message}`, 'error');
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('atendidaPor').value = '';
+            document.getElementById('observacoes').value = '';
+            document.getElementById('semFotos').checked = false;
+            document.querySelector('input[name="status"][value="Pendente"]').checked = true;
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector('.status-option').classList.add('selected');
+            selectedFiles = [];
+            document.getElementById('photoPreview').innerHTML = '';
+            document.getElementById('photoUpload').classList.remove('disabled');
+        }
+
+        function goBack() {
+            // Navega para a página anterior no histórico
+            window.history.back();
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

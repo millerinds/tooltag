@@ -1,0 +1,1228 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha do Item - Gestão App</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .details-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .details-right {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .item-photo {
+            width: 100%;
+            max-width: 250px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #ecf0f1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .item-photo:hover {
+            transform: scale(1.03);
+            border-color: #3498db;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            max-width: 250px;
+            height: 200px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            border: 2px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-size: 2.5em;
+        }
+
+        .qrcode-container {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ecf0f1;
+        }
+
+        .qrcode-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .qrcode-canvas {
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+
+        .item-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .item-codes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .code-badge {
+            background: #34495e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .item-type {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .type-ferramenta {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .type-insumo {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .specifications {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .specs-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .specs-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ecf0f1;
+        }
+
+        .spec-highlight {
+            border-left: 4px solid #27ae60 !important;
+            background: linear-gradient(135deg, #d5f4e6 0%, #fafafa 100%) !important;
+        }
+
+        .spec-highlight .spec-label {
+            color: #27ae60 !important;
+            font-weight: 700 !important;
+        }
+
+        .spec-highlight .spec-value {
+            color: #2c3e50 !important;
+            font-weight: 600 !important;
+        }
+
+        .spec-label {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .spec-value {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .composition {
+            margin-top: 20px;
+        }
+
+        .composition-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .composition-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .composition-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .comp-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .comp-quantity {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(127, 140, 141, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(127, 140, 141, 0.4);
+        }
+
+        .back-button {
+            display: block;
+            margin: 15px auto;
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            width: 100%;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .photo-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .photo-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .photo-modal-content {
+            position: relative;
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .close-photo-modal {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .request-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        .request-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .request-modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 95%;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .modal-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .modal-subtitle {
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: #e74c3c;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 0.8em;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+
+        .form-textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .quantity-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .quantity-input {
+            width: 60px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .Urgêncy-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .Urgêncy-option {
+            position: relative;
+        }
+
+        .Urgêncy-radio {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .Urgêncy-label {
+            display: block;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.7em;
+            text-transform: uppercase;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .Urgêncy-radio:checked + .Urgêncy-label {
+            color: white;
+        }
+
+        .Urgêncy-radio[value="baixa"]:checked + .Urgêncy-label {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-color: #27ae60;
+        }
+
+        .Urgêncy-radio[value="media"]:checked + .Urgêncy-label {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-color: #f39c12;
+        }
+
+        .Urgêncy-radio[value="alta"]:checked + .Urgêncy-label {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-color: #e74c3c;
+        }
+
+        .Urgêncy-radio[value="critica"]:checked + .Urgêncy-label {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            border-color: #8e44ad;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+        }
+
+        .modal-btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-modal:hover {
+            color: #2c3e50;
+        }
+
+        .notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10001;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 800px;
+            }
+
+            .item-details {
+                flex-direction: row;
+                gap: 30px;
+            }
+
+            .details-left {
+                flex: 1;
+            }
+
+            .details-right {
+                width: 250px;
+            }
+
+            .item-photo, .photo-placeholder {
+                width: 250px;
+                height: 200px;
+            }
+
+            .specs-grid, .composition-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .back-button {
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                width: auto;
+                padding: 10px 20px;
+            }
+
+            .Urgêncy-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-actions {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .modal-btn {
+                width: auto;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()"> Voltar</button>
+
+    <div class="container">
+        <div class="header">
+            <h1 id="itemName">Carregando...</h1>
+            <p>Ficha técnica detalhada do item</p>
+        </div>
+
+        <div class="content">
+            <div class="item-details">
+                <div class="details-left">
+                    <div class="item-header">
+                        <h2 class="item-title" id="itemTitle"></h2>
+                        <div class="item-codes" id="itemCodes"></div>
+                        <span class="item-type" id="itemType"></span>
+                    </div>
+
+                    <div class="specifications" id="specifications">
+                        <h3 class="specs-title">
+                            <span></span> Especificações Técnicas
+                        </h3>
+                        <div class="specs-grid" id="specsGrid"></div>
+                    </div>
+
+                    <div class="composition" id="composition" style="display: none;">
+                        <h3 class="composition-title">
+                            <span></span> Composição da Ferramenta
+                        </h3>
+                        <div class="composition-grid" id="compositionGrid"></div>
+                    </div>
+                </div>
+
+                <div class="details-right">
+                    <div id="photoContainer"></div>
+                    
+                    <div class="qrcode-container">
+                        <div class="qrcode-title">QR Code do Item</div>
+                        <canvas id="qrcode" class="qrcode-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="openRequestModal()">
+                    Solicitar Item
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="photoModal" class="photo-modal" onclick="closePhotoModal()">
+        <div class="photo-modal-content" onclick="event.stopPropagation()">
+            <button class="close-photo-modal" onclick="closePhotoModal()">X</button>
+            <img id="modalImage" class="modal-image" src="" alt="Foto ampliada">
+        </div>
+    </div>
+
+    <div id="requestModal" class="request-modal">
+        <div class="request-modal-content">
+            <button class="close-modal" onclick="closeRequestModal()">X</button>
+            
+            <div class="modal-header">
+                <h3 class="modal-title">Solicitar Item</h3>
+                <p class="modal-subtitle" id="modalSubtitle"></p>
+            </div>
+
+            <form id="requestForm">
+                <div class="form-group">
+                    <label class="form-label required">Nome do Operador</label>
+                    <input type="text" class="form-input" name="operador" placeholder="Digite seu nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Máquina/Setor</label>
+                    <input type="text" class="form-input" name="maquina" placeholder="Ex: Torno CNC-01" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Quantidade</label>
+                    <div class="quantity-container">
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
+                        <input type="number" class="quantity-input form-input" id="quantityInput" name="quantidade" value="1" min="1" max="9999" required>
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Nível de Urgência</label>
+                    <div class="Urgêncy-grid">
+                        <div class="Urgêncy-option">
+                            <input type="radio" class="Urgêncy-radio" id="baixa" name="Urgência" value="baixa" required>
+                            <label class="Urgêncy-label" for="baixa">Baixa</label>
+                        </div>
+                        <div class="Urgêncy-option">
+                            <input type="radio" class="Urgêncy-radio" id="media" name="Urgência" value="media">
+                            <label class="Urgêncy-label" for="media">Média</label>
+                        </div>
+                        <div class="Urgêncy-option">
+                            <input type="radio" class="Urgêncy-radio" id="alta" name="Urgência" value="alta">
+                            <label class="Urgêncy-label" for="alta">Alta</label>
+                        </div>
+                        <div class="Urgêncy-option">
+                            <input type="radio" class="Urgêncy-radio" id="critica" name="Urgência" value="critica">
+                            <label class="Urgêncy-label" for="critica">Crítica</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">Justificativa</label>
+                    <textarea class="form-textarea" name="justificativa" placeholder="Descreva o motivo da solicitação..." required></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="modal-btn modal-btn-primary">
+                        Enviar
+                    </button>
+                    <button type="button" class="modal-btn modal-btn-secondary" onclick="closeRequestModal()">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const socket = io('/gestao', { transports: ['websocket', 'polling'] });
+        let currentItem = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const codigoInterno = urlParams.get('codigo_interno');
+
+            if (!codigoInterno) {
+                showError('Código interno do item inválido');
+                return;
+            }
+
+            loadItemDetails(codigoInterno);
+            setupSocketEvents();
+        });
+
+        function setupSocketEvents() {
+            socket.on('connect', () => {
+                console.log('Conectado ao WebSocket');
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('Erro de conexão WebSocket:', error);
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Desconectado do WebSocket');
+            });
+        }
+
+        async function loadItemDetails(codigoInterno) {
+            try {
+                console.log(`Buscando item com código interno: ${codigoInterno}`);
+                const response = await fetch(`/api/itens_cadastro/codigo/${codigoInterno}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Item não encontrado');
+                    }
+                    throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Resposta da API não é JSON');
+                }
+
+                currentItem = await response.json();
+
+                if (!currentItem || !currentItem.nome_descricao) {
+                    throw new Error('Dados do item estão incompletos ou inválidos');
+                }
+
+                console.log('âœ… Item carregado:', currentItem);
+                displayItemDetails(currentItem);
+                generateQRCode(currentItem.codigo_interno);
+
+            } catch (error) {
+                console.error('Erro ao carregar item:', error.message);
+                showError(`Erro ao carregar item: ${error.message}`);
+            }
+        }
+
+        function displayItemDetails(item) {
+            document.getElementById('itemName').textContent = item.nome_descricao;
+            document.getElementById('itemTitle').textContent = item.nome_descricao;
+
+            const codesContainer = document.getElementById('itemCodes');
+            codesContainer.innerHTML = `
+                <span class="code-badge">ID: ${item.codigo_interno}</span>
+                ${item.codigo_fabricacao ? `<span class="code-badge">Fab: ${item.codigo_fabricacao}</span>` : ''}
+            `;
+
+            const typeElement = document.getElementById('itemType');
+            typeElement.textContent = item.tipo_item;
+            typeElement.className = `item-type type-${item.tipo_item.toLowerCase()}`;
+
+            displaySpecifications(item);
+            displayPhoto(item);
+
+            if (item.tipo_item === 'ferramenta' && item.composicao && item.composicao.length > 0) {
+                displayComposition(item.composicao);
+            }
+        }
+
+        function displaySpecifications(item) {
+            const specsGrid = document.getElementById('specsGrid');
+            const specs = [];
+
+            // Exibir máquinas associadas (localização) como primeiro item destacado
+            if (item.maquinas && Array.isArray(item.maquinas) && item.maquinas.length > 0) {
+                specs.push({ 
+                    label: 'Localização (Máquinas)', 
+                    value: item.maquinas.join(', '),
+                    highlight: true
+                });
+            }
+
+            if (item.maquina) {
+                let maquinaLabel = item.maquina;
+                if (item.maquina === 'torno') maquinaLabel = 'Torno';
+                if (item.maquina === 'centro_usinagem') maquinaLabel = 'Centro de Usinagem';
+                specs.push({ label: 'Máquina Destinada', value: maquinaLabel });
+            }
+
+            if (item.categoria) specs.push({ label: 'Categoria', value: item.categoria });
+            if (item.material) specs.push({ label: 'Material', value: item.material });
+            if (item.celulas && Array.isArray(item.celulas) && item.celulas.length > 0) {
+                specs.push({ label: 'Células', value: item.celulas.join(', ') });
+            }
+            if (item.altura_min !== null || item.altura_max !== null) {
+                let alturaValue = '';
+                if (item.altura_min !== null && item.altura_max !== null) {
+                    alturaValue = `${item.altura_min}mm - ${item.altura_max}mm`;
+                } else if (item.altura_min !== null) {
+                    alturaValue = `min: ${item.altura_min}mm`;
+                } else if (item.altura_max !== null) {
+                    alturaValue = `max: ${item.altura_max}mm`;
+                }
+                specs.push({ label: 'Altura', value: alturaValue });
+            }
+            if (item.rpm) specs.push({ label: 'RPM', value: item.rpm.toLocaleString() });
+            if (item.avanco) specs.push({ label: 'Avanço', value: item.avanco });
+            if (item.data_cadastro) specs.push({ label: 'Data de Cadastro', value: item.data_cadastro });
+
+            if (specs.length === 0) {
+                specsGrid.innerHTML = '<p style="color: #7f8c8d; text-align: center;">Nenhuma especificação técnica cadastrada</p>';
+                return;
+            }
+
+            specsGrid.innerHTML = specs.map(spec => `
+                <div class="spec-item ${spec.highlight ? 'spec-highlight' : ''}">
+                    <div class="spec-label">${spec.label}</div>
+                    <div class="spec-value">${spec.value}</div>
+                </div>
+            `).join('');
+        }
+
+        function displayPhoto(item) {
+            const photoContainer = document.getElementById('photoContainer');
+            if (item.foto) {
+                const photoUrl = `/fotos_cadastro/${item.foto}`;
+                photoContainer.innerHTML = `
+                    <img src="${photoUrl}" 
+                         alt="Foto do item" 
+                         class="item-photo" 
+                         onclick="openPhotoModal('${photoUrl}')"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="photo-placeholder" style="display: none;">Foto</div>
+                `;
+            } else {
+                photoContainer.innerHTML = '<div class="photo-placeholder">Foto</div>';
+            }
+        }
+
+        function displayComposition(composition) {
+            const compositionSection = document.getElementById('composition');
+            const compositionGrid = document.getElementById('compositionGrid');
+            compositionSection.style.display = 'block';
+            
+            if (composition.length === 0) {
+                compositionGrid.innerHTML = '<p style="color: #7f8c8d; text-align: center;">Nenhum insumo na composição</p>';
+                return;
+            }
+
+            compositionGrid.innerHTML = composition.map(comp => `
+                <div class="composition-item" role="button" tabindex="0" data-id="${comp.id || ''}" onclick="openComponentFicha(${comp.id})" onkeypress="(event.key==='Enter'||event.key===' ')&&openComponentFicha(${comp.id})" style="cursor: pointer;">
+                    <span class="comp-name">${comp.nome}</span>
+                    <span class="comp-quantity">Qtd: ${comp.quantidade || 1}</span>
+                </div>
+            `).join('');
+        }
+
+        async function openComponentFicha(id) {
+            try {
+                if (!id) return;
+                const resp = await fetch(`/api/itens_cadastro/${id}`);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                const codigo = data && (data.codigo_interno || data.codigo || data.id);
+                if (codigo) {
+                    window.location.href = `/ficha?codigo_interno=${encodeURIComponent(codigo)}`;
+                }
+            } catch (e) {
+                console.error('Erro ao abrir ficha do componente:', e);
+            }
+        }
+
+        function generateQRCode(codigoInterno) {
+            new QRious({
+                element: document.getElementById('qrcode'),
+                value: codigoInterno,
+                size: 120,
+                level: 'M',
+                foreground: '#2c3e50',
+                background: '#ffffff'
+            });
+        }
+
+        function openPhotoModal(photoUrl) {
+            const modal = document.getElementById('photoModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = photoUrl;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePhotoModal() {
+            const modal = document.getElementById('photoModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function openRequestModal() {
+            if (!currentItem) {
+                showNotification('Erro: Dados do item não carregados', true);
+                return;
+            }
+
+            const modal = document.getElementById('requestModal');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            modalSubtitle.textContent = `${currentItem.nome_descricao} (${currentItem.codigo_interno})`;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                const firstInput = modal.querySelector('input[name="operador"]');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+
+        function closeRequestModal() {
+            const modal = document.getElementById('requestModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+            document.getElementById('requestForm').reset();
+        }
+
+        function adjustQuantity(delta) {
+            const input = document.getElementById('quantityInput');
+            const value = parseInt(input.value) || 1;
+            const newValue = Math.max(1, Math.min(9999, value + delta));
+            input.value = newValue;
+        }
+
+        document.getElementById('requestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!currentItem) {
+                showNotification('Erro: Dados do item não carregados', true);
+                return;
+            }
+
+            const submitBtn = this.querySelector('.modal-btn-primary');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Enviando...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(this);
+                formData.append('item_id', currentItem.id);
+                formData.append('nome', currentItem.nome_descricao);
+
+                const response = await fetch('/solicitar_insumo', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                });
+
+                const respType = (response.headers && response.headers.get('content-type')) || '';
+                if (!response.ok) {
+                    if (respType.includes('application/json')) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || `HTTP ${response.status}`);
+                    } else {
+                        const _ = await response.text().catch(() => '');
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                }
+
+                let result = {};
+                if (respType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    // Resposta nao-JSON (HTML/redirect). Considera sucesso sem ID.
+                    try { await response.text(); } catch (e) {}
+                }
+                // Tentar obter ID recém criado se não vier no corpo
+                if (!result.id) {
+                    try {
+                        const listResp = await fetch('/api/insumos', { headers: { 'Accept': 'application/json' } });
+                        if (listResp.ok) {
+                            const list = await listResp.json();
+                            const code = (currentItem.codigo_interno || '').toString();
+                            const name = (currentItem.nome_descricao || '').toString();
+                            const candidates = Array.isArray(list)
+                                ? list.filter(it => ((it.codigo_interno_item || it.codigo_interno || '') === code) || ((it.nome_item || it.nome || '') === name))
+                                : [];
+                            candidates.sort((a,b)=> ((b.id||0) - (a.id||0)) );
+                            if (candidates.length > 0) {
+                                const picked = candidates[0];
+                                result.id = picked.id;
+                                result.data = picked.data || result.data;
+                                result.status = picked.status || result.status;
+                                result.urgencia = picked.urgencia || picked.prioridade || result.urgencia;
+                                result.nome_item = picked.nome_item || picked.nome || result.nome_item;
+                            }
+                        }
+                    } catch (_) {}
+                }
+                const solicitationData = {
+                    id: result.id,
+                    item_id: currentItem.id,
+                    nome: currentItem.nome_descricao,
+                    operador: formData.get('operador'),
+                    maquina: formData.get('maquina'),
+                    quantidade: parseInt(formData.get('quantidade')),
+                    Urgência: formData.get('Urgência'),
+                    justificativa: formData.get('justificativa'),
+                    tipo: currentItem.tipo_item,
+                    data: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+                    status: 'Pendente',
+                    nome_item: currentItem.nome_descricao,
+                    visualizada: false
+                };
+
+                socket.emit('new_solicitation', solicitationData);
+                console.log('Solicitação enviada via WebSocket:', solicitationData);
+                showNotification('Solicitação enviada com sucesso!', false);
+                
+                setTimeout(() => {
+                    closeRequestModal();
+                }, 2000);
+
+            } catch (error) {
+                console.error('Erro ao enviar solicitação:', error);
+                showNotification(`Erro ao enviar: ${error.message}`, true);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showNotification(message, isError = false) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'error' : 'success'}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        if (notification.parentNode) notification.remove();
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+        function showError(message) {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div style="text-align: center; padding: 40px 15px; color: #7f8c8d;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">⚠️</div>
+                    <h3 style="color: #e74c3c; margin-bottom: 8px;">Erro</h3>
+                    <p>${message}</p>
+                    <p style="font-size: 0.8em; margin-top: 8px;">Por favor, verifique o código interno ou tente novamente.</p>
+                    <button class="btn btn-secondary" onclick="goBack()" style="margin-top: 15px;">
+                         Voltar
+                    </button>
+                </div>
+            `;
+        }
+
+        function goBack() {
+            // Navega para a página anterior no histórico
+            window.history.back();
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closePhotoModal();
+                closeRequestModal();
+            }
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                const modal = document.getElementById('requestModal');
+                if (modal.classList.contains('show')) {
+                    document.getElementById('requestForm').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - (window.lastTouchEnd || 0) <= 300) {
+                event.preventDefault();
+            }
+            window.lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
