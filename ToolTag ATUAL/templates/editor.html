@@ -1,0 +1,1859 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão App - Editor de Item</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 20px;
+            position: relative;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input[type="file"] {
+            padding: 10px;
+            background: white;
+            border: 2px dashed #d1d5db;
+            cursor: pointer;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .form-group input[type="file"]:hover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .form-group input[type="file"].dragover {
+            border-color: #10b981;
+            background: #ecfdf5;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+
+        .form-group select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='none' stroke='%236b7280' stroke-width='2' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'></path></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+
+        .drop-zone-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8rem;
+            color: #6b7280;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .drop-zone-container {
+            position: relative;
+        }
+
+        .drop-zone-text.dragover {
+            color: #065f46;
+            font-weight: bold;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .tipo-selector {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tipo-option {
+            position: relative;
+        }
+
+        .tipo-option input[type="radio"] {
+            display: none;
+        }
+
+        .tipo-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f9fafb;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .tipo-option input[type="radio"]:checked + label {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .composicao-section {
+            display: none;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            margin-top: 15px;
+        }
+
+        .composicao-section.show {
+            display: block;
+        }
+
+        .composicao-item {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .composicao-item .remove-btn {
+            align-self: end;
+        }
+
+        .composicao-item:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .composicao-item input[readonly] {
+            background: #e5e7eb;
+            cursor: default;
+        }
+
+        .add-composicao-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+        }
+
+        .add-composicao-btn:hover {
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 44px;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .composicao-info {
+            background: #e0f2fe;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #0284c7;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #0c4a6e;
+        }
+
+        .composicao-summary {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 15px;
+        }
+
+        .composicao-summary h4 {
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .composicao-list {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            transition: all 0.2s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+        }
+
+        .search-result-item:hover {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .search-result-item.no-results {
+            color: #6b7280;
+            cursor: default;
+        }
+
+        .search-result-item.no-results:hover {
+            background: none;
+        }
+
+        /* Estilos para a seção de máquinas */
+        .maquinas-section {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0f2fe;
+            margin-top: 15px;
+        }
+
+        .maquina-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .maquina-input-container .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .add-maquina-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            height: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+        }
+
+        .add-maquina-btn:hover {
+            box-shadow: 0 3px 10px rgba(14, 165, 233, 0.3);
+        }
+
+        .add-maquina-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .maquinas-list {
+            margin-top: 15px;
+        }
+
+        .maquina-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 6px 10px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 3px 6px 3px 0;
+            border: 1px solid #bfdbfe;
+            transition: all 0.2s ease;
+        }
+
+        .maquina-tag:hover {
+            background: #bfdbfe;
+        }
+
+        .maquina-tag .remove-maquina {
+            margin-left: 6px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .maquina-tag .remove-maquina:hover {
+            background: #dc2626;
+        }
+
+        .maquinas-summary {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 15px;
+        }
+
+        .maquinas-summary h4 {
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .maquinas-summary div {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .current-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            margin-bottom: 10px;
+            display: block;
+            object-fit: contain;
+            width: auto;
+            height: auto;
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-direction: column;
+        }
+
+        .remove-image-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            min-height: 44px;
+        }
+
+        .remove-image-btn:hover {
+            background: #dc2626;
+        }
+
+        .flash-messages {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .flash-message {
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            width: 100%;
+            max-width: 90%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease forwards, fadeOut 5s ease 2s forwards;
+        }
+
+        .flash-message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .flash-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .flash-message.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .submit-btn,
+        .back-btn,
+        .delete-btn {
+            width: 100%;
+            max-width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            min-height: 48px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            border: none;
+        }
+
+        .back-btn:hover {
+            box-shadow: 0 5px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .click-effect {
+            animation: clickPulse 0.2s ease;
+        }
+
+        @keyframes clickPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading-spinner-btn {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 6px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 900px;
+                border-radius: 20px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+                padding: 30px;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .form-container {
+                padding: 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 20px;
+            }
+
+            .form-section {
+                margin-bottom: 35px;
+            }
+
+            .section-title {
+                font-size: 1.25rem;
+            }
+
+            .form-group label {
+                font-size: 0.875rem;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .form-group input[type="file"] {
+                height: 120px;
+            }
+
+            .drop-zone-text {
+                font-size: 0.875rem;
+            }
+
+            .tipo-selector {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .tipo-option label {
+                padding: 15px;
+                font-size: 1rem;
+            }
+
+            .composicao-section {
+                padding: 25px;
+                margin-top: 20px;
+            }
+
+            .composicao-item {
+                grid-template-columns: 2fr 1fr auto;
+                gap: 15px;
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            .add-composicao-btn {
+                padding: 12px 24px;
+                font-size: 0.875rem;
+                margin-top: 15px;
+            }
+
+            .remove-btn {
+                padding: 10px 15px;
+                font-size: 0.75rem;
+            }
+
+            .composicao-info {
+                padding: 15px;
+                font-size: 0.875rem;
+            }
+
+            .composicao-summary {
+                padding: 15px;
+                margin-top: 20px;
+            }
+
+            .composicao-summary h4 {
+                font-size: 1rem;
+            }
+
+            .composicao-list {
+                font-size: 0.875rem;
+            }
+
+            .search-container {
+                margin-bottom: 20px;
+            }
+
+            .search-container input {
+                padding: 12px 16px;
+                font-size: 1rem;
+            }
+
+            .search-results {
+                max-height: 200px;
+            }
+
+            .search-result-item {
+                padding: 10px 16px;
+                font-size: 0.875rem;
+            }
+
+            .current-image {
+                max-height: 200px;
+            }
+
+            .image-actions {
+                flex-direction: row;
+            }
+
+            .remove-image-btn {
+                padding: 8px 16px;
+                font-size: 0.75rem;
+            }
+
+            .flash-messages {
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+            }
+
+            .flash-message {
+                font-size: 0.875rem;
+                padding: 15px;
+                max-width: 500px;
+            }
+
+            .button-group {
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .submit-btn,
+            .back-btn,
+            .delete-btn {
+                width: auto;
+                padding: 15px 40px;
+                font-size: 1rem;
+            }
+
+            .maquina-input-container {
+                flex-direction: row;
+            }
+
+            .add-maquina-btn {
+                padding: 12px 20px;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Editor de Item</h1>
+            <p>Edite as informações do item cadastrado</p>
+        </div>
+
+        <div class="form-container">
+            <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <form id="editorForm" method="POST" enctype="multipart/form-data" autocomplete="off">
+                <div class="form-section">
+                    <div class="section-title">Tipo do Item <span class="required">*</span></div>
+                    <div class="tipo-selector">
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo_ferramenta" name="tipo_item" value="ferramenta" required>
+                            <label for="tipo_ferramenta">Ferramenta</label>
+                        </div>
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo_insumo" name="tipo_item" value="insumo" required>
+                            <label for="tipo_insumo">Insumo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Informações Básicas</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="codigo_fabricacao">Código de Fabricação</label>
+                            <input type="text" id="codigo_fabricacao" name="codigo_fabricacao" placeholder="Ex: FAB001">
+                        </div>
+                        <div class="form-group">
+                            <label for="codigo_interno">Código Interno <span class="required">*</span></label>
+                            <input type="text" id="codigo_interno" name="codigo_interno" required placeholder="Ex: INT001">
+                            <small id="codigo-feedback" style="color: #6b7280; font-size: 0.75rem;"></small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="nome_descricao">Nome/Descrição <span class="required">*</span></label>
+                            <input type="text" id="nome_descricao" name="nome_descricao" required placeholder="Ex: Broca HSS 6mm">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="foto">Foto (Opcional)</label>
+                            <div id="current-image-container" style="display: none;">
+                                <img id="current-image" class="current-image" alt="Imagem atual">
+                                <div class="image-actions">
+                                    <button type="button" id="remove-image-btn" class="remove-image-btn">Remover Foto Atual</button>
+                                    <input type="hidden" id="remove_foto" name="remove_foto" value="false">
+                                </div>
+                            </div>
+                            <div class="drop-zone-container">
+                                <input type="file" id="foto" name="foto" accept="image/*" aria-describedby="foto-help">
+                                <span class="drop-zone-text">Arraste e solte uma imagem ou clique para selecionar</span>
+                            </div>
+                            <small id="foto-help" style="color: #6b7280; font-size: 0.75rem;">Formatos: PNG, JPG, JPEG, GIF, WEBP (máx. 16MB)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Especificações</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="categoria">Categoria</label>
+                            <input type="text" id="categoria" name="categoria" placeholder="Ex: Desbaste, Acabamento">
+                        </div>
+                        <div class="form-group">
+                            <label for="material">Material</label>
+                            <input type="text" id="material" name="material" placeholder="Ex: HSS, Metal Duro">
+                        </div>
+                        <div class="form-group" id="ferramenta-tipo-container" style="display: none;">
+                            <label for="ferramenta_tipo">Tipo de Ferramenta (opcional)</label>
+                            <select id="ferramenta_tipo" name="ferramenta_tipo">
+                                <option value="" selected>Selecione o tipo (opcional)</option>
+                                <option value="torno">Torno</option>
+                                <option value="centro_usinagem">Centro de Usinagem</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção de máquinas compatíveis -->
+                <div class="form-section">
+                    <div class="section-title">Máquinas Compatíveis</div>
+                    <div class="maquinas-section">
+                        <div class="composicao-info">
+                            <strong>ℹ️ Informação:</strong> Adicione as máquinas onde este item pode ser utilizado. Digite o nome da máquina e clique em "Adicionar".
+                        </div>
+                        
+                        <div class="maquina-input-container">
+                            <div class="form-group">
+                                <label for="nova-maquina">Nova Máquina</label>
+                                <input type="text" id="nova-maquina" placeholder="Ex: Torno CNC 01, Centro Usinagem 02" maxlength="100">
+                            </div>
+                            <button type="button" id="add-maquina-btn" class="add-maquina-btn" onclick="addMaquina()">
+                                <span>+</span> Adicionar
+                            </button>
+                        </div>
+
+                        <div class="maquinas-list" id="maquinas-list"></div>
+
+                        <div class="maquinas-summary" id="maquinas-summary" style="display: none;">
+                            <h4>Máquinas Adicionadas:</h4>
+                            <div id="maquinas-summary-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Parâmetros Internos</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="altura_min">Altura Mínima (mm)</label>
+                            <input type="number" id="altura_min" name="altura_min" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="altura_max">Altura Máxima (mm)</label>
+                            <input type="number" id="altura_max" name="altura_max" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="rpm">RPM</label>
+                            <input type="number" id="rpm" name="rpm" min="0" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label for="avanco">Avanço (mm/min)</label>
+                            <input type="number" id="avanco" name="avanco" step="0.01" min="0" placeholder="0.10">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="composicao-section" class="composicao-section">
+                    <div class="section-title">Composição da Ferramenta</div>
+                    <div class="composicao-info">
+                        <strong>Informação:</strong> Pesquise insumos pelo Código interno e clique para adicioná-los à composição com suas quantidades.
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="insumo-search" placeholder="Pesquisar insumo por Código interno (ex: INT001)">
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+                    <div id="composicao-items"></div>
+                    <div class="composicao-summary" id="composicao-summary" style="display: none;">
+                        <h4>Resumo da Composição:</h4>
+                        <div class="composicao-list" id="composicao-list"></div>
+                    </div>
+                </div>
+
+                <!-- Campos hidden para enviar as máquinas -->
+                <div id="maquinas-hidden-inputs"></div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn" id="submitBtn" onclick="addClickEffect(this)">
+                        Salvar Alterações
+                    </button>
+                    <button type="button" class="delete-btn" id="deleteBtn" onclick="handleDelete(this)">
+                        Excluir Item
+                    </button>
+                    <button type="button" class="back-btn" onclick="handleBack(this)">
+                        Voltar
+                    </button>
+                </div>
+            </form>
+            <div id="flash-messages" class="flash-messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentItem = null;
+        let insumosDisponiveis = [];
+        let composicaoCounter = 0;
+        let isCodigoInternoValid = true;
+        let originalCodigoInterno = '';
+        let maquinasAdicionadas = [];
+
+        function getItemIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        async function loadItem() {
+            const itemId = getItemIdFromUrl();
+            if (!itemId) {
+                showFlashMessage('ID do item não fornecido', 'error');
+                setTimeout(() => window.location.href = '/gestao', 2000);
+                return;
+            }
+
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            try {
+                const response = await fetch(`/api/itens_cadastro/${itemId}`);
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                currentItem = await response.json();
+                originalCodigoInterno = currentItem.codigo_interno;
+                populateForm(currentItem);
+                
+                // Carregar máquinas do item
+                await loadMaquinasItem(itemId);
+                
+                showFlashMessage('Item carregado com sucesso', 'success');
+            } catch (error) {
+                console.error('Erro ao carregar item:', error);
+                showFlashMessage('Erro ao carregar item: ' + error.message, 'error');
+                setTimeout(() => window.location.href = '/gestao', 2000);
+            } finally {
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        }
+
+        async function loadMaquinasItem(itemId) {
+            try {
+                const response = await fetch(`/api/maquinas/item/${itemId}`);
+                if (response.ok) {
+                    const maquinas = await response.json();
+                    maquinasAdicionadas = maquinas.map(m => m.toLowerCase());
+                    updateMaquinasList();
+                    updateMaquinasHiddenInputs();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar máquinas do item:', error);
+            }
+        }
+
+        function populateForm(item) {
+            document.querySelector(`input[name="tipo_item"][value="${item.tipo_item}"]`).checked = true;
+            document.getElementById('codigo_fabricacao').value = item.codigo_fabricacao || '';
+            document.getElementById('codigo_interno').value = item.codigo_interno || '';
+            document.getElementById('nome_descricao').value = item.nome_descricao || '';
+            document.getElementById('categoria').value = item.categoria || '';
+            document.getElementById('material').value = item.material || '';
+            document.getElementById('altura_min').value = item.altura_min || '';
+            document.getElementById('altura_max').value = item.altura_max || '';
+            document.getElementById('rpm').value = item.rpm || '';
+            document.getElementById('avanco').value = item.avanco || '';
+            document.getElementById('ferramenta_tipo').value = item.maquina || '';
+
+            if (item.foto) {
+                const currentImageContainer = document.getElementById('current-image-container');
+                const currentImage = document.getElementById('current-image');
+                currentImage.src = `/fotos_cadastro/${item.foto}`;
+                currentImageContainer.style.display = 'block';
+            }
+
+            if (item.tipo_item === 'ferramenta') {
+                document.getElementById('composicao-section').classList.add('show');
+                document.getElementById('ferramenta-tipo-container').style.display = 'block';
+                loadComposicao(item.composicao || []);
+            }
+
+            document.getElementById('codigo-feedback').textContent = 'Código atual válido';
+            document.getElementById('codigo-feedback').style.color = '#10b981';
+        }
+
+        // Funcionalidades de máquinas
+        function addMaquina() {
+            const input = document.getElementById('nova-maquina');
+            const maquinaNome = input.value.trim();
+            
+            if (!maquinaNome) {
+                showFlashMessage('Digite o nome da máquina', 'error');
+                return;
+            }
+            
+            if (maquinaNome.length < 2) {
+                showFlashMessage('Nome da máquina deve ter pelo menos 2 caracteres', 'error');
+                return;
+            }
+            
+            if (maquinasAdicionadas.includes(maquinaNome.toLowerCase())) {
+                showFlashMessage('Esta máquina já foi adicionada', 'error');
+                return;
+            }
+            
+            maquinasAdicionadas.push(maquinaNome.toLowerCase());
+            input.value = '';
+            updateMaquinasList();
+            updateMaquinasHiddenInputs();
+        }
+
+        function removeMaquina(maquinaNome) {
+            const index = maquinasAdicionadas.indexOf(maquinaNome.toLowerCase());
+            if (index > -1) {
+                maquinasAdicionadas.splice(index, 1);
+                updateMaquinasList();
+                updateMaquinasHiddenInputs();
+            }
+        }
+
+        function updateMaquinasList() {
+            const container = document.getElementById('maquinas-list');
+            const summary = document.getElementById('maquinas-summary');
+            const summaryList = document.getElementById('maquinas-summary-list');
+            
+            if (maquinasAdicionadas.length === 0) {
+                container.innerHTML = '';
+                summary.style.display = 'none';
+                return;
+            }
+            
+            // Criar tags das máquinas com capitalização correta
+            const maquinasOriginais = maquinasAdicionadas.map(m => {
+                return m.split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+            });
+            
+            container.innerHTML = maquinasOriginais.map(maquina => `
+                <span class="maquina-tag">
+                    ${maquina}
+                    <button type="button" class="remove-maquina" onclick="removeMaquina('${maquina.toLowerCase()}')" title="Remover máquina">
+                        ×
+                    </button>
+                </span>
+            `).join('');
+            
+            // Atualizar resumo
+            summaryList.innerHTML = `${maquinasAdicionadas.length} máquina(s): ${maquinasOriginais.join(', ')}`;
+            summary.style.display = 'block';
+        }
+
+        function updateMaquinasHiddenInputs() {
+            const container = document.getElementById('maquinas-hidden-inputs');
+            container.innerHTML = maquinasAdicionadas.map((maquina, index) => {
+                const maquinaOriginal = maquina.split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                ).join(' ');
+                return `<input type="hidden" name="maquinas" value="${maquinaOriginal}">`;
+            }).join('');
+        }
+
+        function loadComposicao(composicao) {
+            const container = document.getElementById('composicao-items');
+            container.innerHTML = '';
+            
+            composicao.forEach(insumo => {
+                addInsumoToComposicaoFromData(insumo.id, insumo.nome, 1);
+            });
+            
+            updateComposicaoSummary();
+        }
+
+        function addInsumoToComposicaoFromData(id, nome, quantidade) {
+            const container = document.getElementById('composicao-items');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'composicao-item';
+            const found = insumosDisponiveis.find(x => String(x.id) === String(id));
+            const codigo = found ? (found.codigo_interno || '') : '';
+            const nomeDisplay = found ? (found.nome_descricao || nome || '') : (nome || '');
+            const display = codigo ? `${codigo} - ${nomeDisplay}` : `${nomeDisplay}`;
+            itemDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Insumo <span class="required">*</span></label>
+                    <input type="text" readonly value="${display}">
+                    <input type="hidden" name="composicao_insumos" value="${id}">
+                </div>
+                <div class="form-group">
+                    <label>Quantidade <span class="required">*</span></label>
+                    <input type="number" name="composicao_quantidades" min="1" value="${quantidade}" required onchange="updateComposicaoSummary()">
+                </div>
+                <button type="button" class="remove-btn" onclick="removeComposicaoItem(this)" title="Remover este insumo">
+                    <span></span> Remover
+                </button>
+            `;
+            container.appendChild(itemDiv);
+            composicaoCounter++;
+        }
+
+        async function loadInsumos() {
+            try {
+                const response = await fetch('/api/insumos_cadastro');
+                if (response.ok) {
+                    insumosDisponiveis = await response.json();
+                    console.log(`${insumosDisponiveis.length} insumos carregados`);
+                    try {
+                        const comps = document.querySelectorAll('input[name="composicao_insumos"]');
+                        comps.forEach(inp => {
+                            const disp = inp.parentNode.querySelector('input[readonly]');
+                            if (!disp) return;
+                            const hasSep = disp.value && disp.value.includes(' - ');
+                            const found = insumosDisponiveis.find(x => String(x.id) === String(inp.value));
+                            if (!hasSep && found && found.codigo_interno) {
+                                const nomeAtual = disp.value || (found.nome_descricao || '');
+                                disp.value = `${found.codigo_interno} - ${nomeAtual}`;
+                            }
+                        });
+                        updateComposicaoSummary();
+                    } catch (e) { /* noop */ }
+                } else {
+                    console.error('Erro ao carregar insumos:', response.statusText);
+                    showFlashMessage('Erro ao carregar lista de insumos', 'warning');
+                    insumosDisponiveis = [];
+                }
+            } catch (error) {
+                console.error('Erro ao carregar insumos:', error);
+                showFlashMessage('Erro de conexão ao carregar insumos', 'error');
+                insumosDisponiveis = [];
+            }
+        }
+
+        async function checkCodigoInterno(codigo) {
+            if (!codigo || typeof codigo !== 'string' || codigo.trim() === '') {
+                return { exists: false, error: 'Código interno inválido' };
+            }
+            
+            if (codigo === originalCodigoInterno) {
+                return { exists: false, error: null };
+            }
+            
+            try {
+                const response = await fetch(`/api/verificar_codigo_interno?codigo=${encodeURIComponent(codigo)}`);
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                return { exists: data.exists, error: null };
+            } catch (error) {
+                console.error('Erro ao verificar Código interno:', error.message);
+                return { exists: false, error: error.message };
+            }
+        }
+
+        function updateSearchResults(searchTerm) {
+            const searchInput = document.getElementById('insumo-search');
+            const searchResults = document.getElementById('search-results');
+            const term = (searchTerm || '').toLowerCase();
+            const isFocused = document.activeElement === searchInput;
+
+            if (!isFocused || term.length === 0) {
+                searchResults.classList.remove('show');
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            const ranked = insumosDisponiveis
+                .filter(insumo => {
+                    const codigo = (insumo.codigo_interno || '').toLowerCase();
+                    const nome = (insumo.nome_descricao || insumo.nome || '').toLowerCase();
+                    return codigo.includes(term) || nome.includes(term);
+                })
+                .map(insumo => {
+                    const codigo = (insumo.codigo_interno || '').toLowerCase();
+                    const nome = (insumo.nome_descricao || insumo.nome || '').toLowerCase();
+                    const cStarts = codigo.startsWith(term) ? 0 : 1;
+                    const nStarts = nome.startsWith(term) ? 0 : 1;
+                    const cIndex = codigo.indexOf(term);
+                    const nIndex = nome.indexOf(term);
+                    return {
+                        insumo,
+                        key: [cStarts, nStarts, cIndex === -1 ? 9999 : cIndex, nIndex === -1 ? 9999 : nIndex, codigo.length, nome.length]
+                    };
+                })
+                .sort((a, b) => {
+                    for (let i = 0; i < a.key.length; i++) {
+                        if (a.key[i] !== b.key[i]) return a.key[i] - b.key[i];
+                    }
+                    return 0;
+                })
+                .slice(0, 5)
+                .map(x => x.insumo);
+
+            if (ranked.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item no-results">Nenhum insumo encontrado</div>';
+            } else {
+                searchResults.innerHTML = ranked.map(insumo => {
+                    const nome = (insumo.nome_descricao || '').replace(/'/g, "\\'");
+                    return `
+                    <div class="search-result-item" onclick="addInsumoToComposicao(${insumo.id}, '${insumo.codigo_interno}', '${nome}')">
+                        ${insumo.codigo_interno} - ${insumo.nome_descricao}
+                    </div>`;
+                }).join('');
+            }
+            searchResults.classList.add('show');
+        }
+
+        function addInsumoToComposicao(id, codigo, nome) {
+            const selectedInsumos = Array.from(document.querySelectorAll('input[name="composicao_insumos"]')).map(input => input.value);
+            if (selectedInsumos.includes(id.toString())) {
+                showFlashMessage('Este insumo já foi adicionado à composição', 'error');
+                return;
+            }
+
+            const container = document.getElementById('composicao-items');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'composicao-item';
+            itemDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Insumo <span class="required">*</span></label>
+                    <input type="text" readonly value="${codigo} - ${nome}">
+                    <input type="hidden" name="composicao_insumos" value="${id}">
+                </div>
+                <div class="form-group">
+                    <label>Quantidade <span class="required">*</span></label>
+                    <input type="number" name="composicao_quantidades" min="1" value="1" required onchange="updateComposicaoSummary()">
+                </div>
+                <button type="button" class="remove-btn" onclick="removeComposicaoItem(this)" title="Remover este insumo">
+                    <span></span> Remover
+                </button>
+            `;
+            container.appendChild(itemDiv);
+            composicaoCounter++;
+            updateComposicaoSummary();
+            document.getElementById('insumo-search').value = '';
+            updateSearchResults('');
+            document.getElementById('search-results').classList.remove('show');
+        }
+
+        function removeComposicaoItem(button) {
+            if (confirm('Tem certeza que deseja remover este insumo da composição?')) {
+                button.closest('.composicao-item').remove();
+                updateComposicaoSummary();
+            }
+        }
+
+        function updateComposicaoSummary() {
+            const insumos = document.querySelectorAll('input[name="composicao_insumos"]');
+            const quantities = document.querySelectorAll('input[name="composicao_quantidades"]');
+            const summaryDiv = document.getElementById('composicao-summary');
+            const listDiv = document.getElementById('composicao-list');
+            
+            let items = [];
+            for (let i = 0; i < insumos.length; i++) {
+                const insumoInput = insumos[i];
+                const quantityInput = quantities[i];
+                const displayInput = insumoInput.parentNode.querySelector('input[readonly]');
+                
+                if (insumoInput.value && quantityInput.value && parseInt(quantityInput.value) > 0) {
+                    const displayVal = displayInput ? displayInput.value : '';
+                    let codigoResumo = '';
+                    let nomeResumo = '';
+                    if (displayVal.includes(' - ')) {
+                        const parts = displayVal.split(' - ');
+                        codigoResumo = parts[0] || '';
+                        nomeResumo = parts.slice(1).join(' - ') || '';
+                    } else {
+                        const found = insumosDisponiveis.find(x => String(x.id) === String(insumoInput.value));
+                        codigoResumo = found ? (found.codigo_interno || '') : '';
+                        nomeResumo = displayVal || (found ? (found.nome_descricao || '') : '');
+                        if (displayInput && codigoResumo && !displayVal.includes(' - ')) {
+                            displayInput.value = `${codigoResumo} - ${nomeResumo}`;
+                        }
+                    }
+                    items.push({
+                        codigo: codigoResumo,
+                        nome: nomeResumo,
+                        quantidade: parseInt(quantityInput.value)
+                    });
+                }
+            }
+            
+            if (items.length > 0) {
+                listDiv.innerHTML = items.map(item => 
+                    `- ${item.quantidade}x ${item.codigo} - ${item.nome}`
+                ).join('<br>');
+                summaryDiv.style.display = 'block';
+            } else {
+                summaryDiv.style.display = 'none';
+            }
+        }
+
+        document.querySelectorAll('input[name="tipo_item"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const composicaoSection = document.getElementById('composicao-section');
+                const ferramentaTipoContainer = document.getElementById('ferramenta-tipo-container');
+                const searchInput = document.getElementById('insumo-search');
+                const ferramentaTipoSelect = document.getElementById('ferramenta_tipo');
+                
+                if (this.value === 'ferramenta') {
+                    composicaoSection.classList.add('show');
+                    ferramentaTipoContainer.style.display = 'block';
+                    if (document.getElementById('composicao-items').children.length === 0) {
+                        updateSearchResults('');
+                    }
+                } else {
+                    composicaoSection.classList.remove('show');
+                    ferramentaTipoContainer.style.display = 'none';
+                    document.getElementById('composicao-items').innerHTML = '';
+                    searchInput.value = '';
+                    updateSearchResults('');
+                    updateComposicaoSummary();
+                    ferramentaTipoSelect.value = '';
+                }
+            });
+        });
+
+        // Event listeners para máquinas
+        document.getElementById('nova-maquina').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addMaquina();
+            }
+        });
+
+        document.getElementById('nova-maquina').addEventListener('input', function() {
+            const btn = document.getElementById('add-maquina-btn');
+            btn.disabled = this.value.trim().length < 2;
+        });
+
+        document.getElementById('insumo-search').addEventListener('input', function() {
+            const searchTerm = this.value;
+            updateSearchResults(searchTerm);
+        });
+        document.getElementById('insumo-search').addEventListener('focus', function() {
+            updateSearchResults(this.value || '');
+        });
+
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.querySelector('.search-container');
+            if (!searchContainer.contains(e.target)) {
+                document.getElementById('search-results').classList.remove('show');
+            }
+        });
+
+        document.getElementById('remove-image-btn').addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja remover a foto atual?')) {
+                document.getElementById('current-image-container').style.display = 'none';
+                document.getElementById('remove_foto').value = 'true';
+                showFlashMessage('Foto marcada para remoção', 'warning');
+            }
+        });
+
+        function addClickEffect(element) {
+            element.classList.add('click-effect');
+            setTimeout(() => {
+                element.classList.remove('click-effect');
+            }, 300);
+        }
+
+        function handleBack(button) {
+            addClickEffect(button);
+            setTimeout(() => {
+                if (document.referrer && document.referrer !== window.location.href) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/gestao';
+                }
+            }, 300);
+        }
+
+        async function handleDelete(button) {
+            if (!currentItem) return;
+
+            const confirmMessage = `Tem certeza que deseja excluir o item "${currentItem.nome_descricao}"?\n\nEsta ação não pode ser desfeita!`;
+            if (!confirm(confirmMessage)) return;
+
+            addClickEffect(button);
+            button.classList.add('loading');
+            button.innerHTML = '<span class="loading-spinner-btn"></span>Excluindo...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch(`/api/itens_cadastro/${currentItem.id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showFlashMessage('Item excluído com sucesso!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/gestao';
+                    }, 2000);
+                } else {
+                    const data = await response.json();
+                    showFlashMessage(data.error || 'Erro ao excluir item', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir item:', error);
+                showFlashMessage('Erro de conexão ao excluir item', 'error');
+            } finally {
+                button.classList.remove('loading');
+                button.innerHTML = 'Excluir Item';
+                button.disabled = false;
+            }
+        }
+
+        function showFlashMessage(message, type) {
+            const container = document.getElementById('flash-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flash-message ${type}`;
+            messageDiv.textContent = message;
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        document.getElementById('editorForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const codigoInterno = document.getElementById('codigo_interno').value.trim();
+            const nomeDescricao = document.getElementById('nome_descricao').value.trim();
+            const tipoItem = document.querySelector('input[name="tipo_item"]:checked');
+            const ferramentaTipo = document.getElementById('ferramenta_tipo').value;
+
+            if (!tipoItem) {
+                showFlashMessage('Selecione o tipo do item (Ferramenta ou Insumo)', 'error');
+                return;
+            }
+
+            if (codigoInterno.length < 2) {
+                showFlashMessage('Código interno deve ter pelo menos 2 caracteres', 'error');
+                return;
+            }
+
+            if (nomeDescricao.length < 3) {
+                showFlashMessage('Nome/Descrição deve ter pelo menos 3 caracteres', 'error');
+                return;
+            }
+
+            const result = await checkCodigoInterno(codigoInterno);
+            if (result.error) {
+                showFlashMessage(`Erro ao verificar Código interno: ${result.error}`, 'error');
+                return;
+            }
+            if (result.exists) {
+                showFlashMessage('Código interno já está cadastrado', 'error');
+                return;
+            }
+
+            if (tipoItem.value === 'ferramenta') {
+                const insumos = document.querySelectorAll('input[name="composicao_insumos"]');
+                const quantidades = document.querySelectorAll('input[name="composicao_quantidades"]');
+
+                if (insumos.length === 0) {
+                    showFlashMessage('Ferramentas devem ter pelo menos um insumo na composição', 'error');
+                    return;
+                }
+
+                let hasValidComposition = false;
+                for (let i = 0; i < insumos.length; i++) {
+                    const insumoValue = insumos[i].value;
+                    const quantidadeValue = quantidades[i] ? quantidades[i].value : '';
+                    
+                    if (insumoValue && quantidadeValue && parseInt(quantidadeValue) > 0) {
+                        hasValidComposition = true;
+                    } else if (insumoValue || quantidadeValue) {
+                        showFlashMessage('Preencha completamente todos os campos de composição ou remova itens incompletos', 'error');
+                        return;
+                    }
+                }
+
+                if (!hasValidComposition) {
+                    showFlashMessage('Adicione pelo menos um insumo válido à composição da ferramenta', 'error');
+                    return;
+                }
+            }
+
+            const alturaMin = parseFloat(document.getElementById('altura_min').value || 0);
+            const alturaMax = parseFloat(document.getElementById('altura_max').value || 0);
+            
+            if (alturaMax > 0 && alturaMin > alturaMax) {
+                showFlashMessage('Altura mínima não pode ser maior que altura máxima', 'error');
+                return;
+            }
+
+            submitBtn.classList.add('loading');
+            submitBtn.innerHTML = '<span class="loading-spinner-btn"></span>Salvando...';
+            submitBtn.disabled = true;
+
+            // Atualizar inputs hidden das máquinas antes do envio
+            updateMaquinasHiddenInputs();
+
+            const composicaoData = [];
+            const insumos = document.querySelectorAll('input[name="composicao_insumos"]');
+            const quantidades = document.querySelectorAll('input[name="composicao_quantidades"]');
+            
+            for (let i = 0; i < insumos.length; i++) {
+                if (insumos[i].value && quantidades[i] && quantidades[i].value) {
+                    composicaoData.push({
+                        id: parseInt(insumos[i].value),
+                        quantidade: parseInt(quantidades[i].value)
+                    });
+                }
+            }
+
+            const formData = new FormData(this);
+            formData.append('composicao', JSON.stringify(composicaoData));
+            formData.append('ferramenta_tipo', ferramentaTipo);
+
+            try {
+                const response = await fetch(`/api/itens_cadastro/${currentItem.id}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showFlashMessage(data.message || 'Item atualizado com sucesso', 'success');
+                    setTimeout(() => {
+                        loadItem();
+                    }, 1000);
+                } else {
+                    showFlashMessage(data.message || 'Erro ao atualizar item', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar formulário:', error);
+                showFlashMessage('Erro de conexão ao atualizar item', 'error');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML = 'Salvar Alterações';
+                submitBtn.disabled = !isCodigoInternoValid;
+            }
+        });
+
+        document.getElementById('codigo_interno').addEventListener('input', async function() {
+            const value = this.value.trim();
+            const feedback = document.getElementById('codigo-feedback');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (value.length < 2 && value.length > 0) {
+                feedback.textContent = 'Mínimo 2 caracteres';
+                feedback.style.color = '#ef4444';
+                isCodigoInternoValid = false;
+                submitBtn.disabled = true;
+            } else if (value.length >= 2) {
+                const result = await checkCodigoInterno(value);
+                if (result.error) {
+                    feedback.textContent = 'Erro ao verificar Código';
+                    feedback.style.color = '#ef4444';
+                    isCodigoInternoValid = false;
+                    submitBtn.disabled = true;
+                    showFlashMessage(`Erro ao verificar Código interno: ${result.error}`, 'error');
+                } else if (result.exists) {
+                    feedback.textContent = 'Código interno já cadastrado';
+                    feedback.style.color = '#ef4444';
+                    isCodigoInternoValid = false;
+                    submitBtn.disabled = true;
+                } else {
+                    feedback.textContent = 'Código válido';
+                    feedback.style.color = '#10b981';
+                    isCodigoInternoValid = true;
+                    submitBtn.disabled = false;
+                }
+            } else {
+                feedback.textContent = '';
+                isCodigoInternoValid = false;
+                submitBtn.disabled = true;
+            }
+        });
+
+        function validateFile(file) {
+            const feedback = document.getElementById('foto-help');
+            const maxSize = 16 * 1024 * 1024;
+            const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+            
+            if (!file) {
+                feedback.textContent = 'Formatos: PNG, JPG, JPEG, GIF, WEBP (máx. 16MB)';
+                feedback.style.color = '#6b7280';
+                return false;
+            }
+
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(extension)) {
+                showFlashMessage('Formato de arquivo inválido. Use: PNG, JPG, JPEG, GIF, WEBP', 'error');
+                feedback.textContent = 'Formato inválido';
+                feedback.style.color = '#ef4444';
+                return false;
+            } else if (file.size > maxSize) {
+                showFlashMessage('Arquivo muito grande. Tamanho máximo: 16MB', 'error');
+                feedback.textContent = 'Arquivo muito grande';
+                feedback.style.color = '#ef4444';
+                return false;
+            } else {
+                feedback.textContent = `Arquivo válido: ${file.name}`;
+                feedback.style.color = '#10b981';
+                return true;
+            }
+        }
+
+        const fileInput = document.getElementById('foto');
+        const dropZone = fileInput.parentNode;
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileInput.classList.add('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.add('dragover');
+            dropZone.querySelector('.drop-zone-text').textContent = 'Solte a imagem aqui';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            fileInput.classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.remove('dragover');
+            updateDropZoneText();
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileInput.classList.remove('dragover');
+            dropZone.querySelector('.drop-zone-text').classList.remove('dragover');
+            updateDropZoneText();
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 1) {
+                showFlashMessage('Por favor, arraste apenas um arquivo por vez', 'error');
+                return;
+            }
+            if (files.length === 1) {
+                fileInput.files = files;
+                validateFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', function() {
+            validateFile(this.files[0]);
+        });
+
+        function updateDropZoneText() {
+            const dropZoneText = document.querySelector('.drop-zone-text');
+            if (window.innerWidth <= 768) {
+                dropZoneText.textContent = 'Arraste ou clique para selecionar imagem';
+            } else {
+                dropZoneText.textContent = 'Arraste e solte uma imagem ou clique para selecionar';
+            }
+        }
+
+        window.addEventListener('resize', updateDropZoneText);
+        window.addEventListener('DOMContentLoaded', () => {
+            updateDropZoneText();
+            loadInsumos();
+            loadItem();
+            
+            // Inicializar botão de máquinas como desabilitado
+            document.getElementById('add-maquina-btn').disabled = true;
+            
+            const elements = document.querySelectorAll('.form-section, .button-group');
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        const addBtn = document.querySelector('.add-composicao-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', function() {
+                document.getElementById('insumo-search').focus();
+            });
+        }
+        
+        // Força rótulo correto no botão Salvar (UTF-8)
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('submitBtn');
+            if (!btn) return;
+            const correct = 'Salvar Alterações';
+            const normalize = () => { if (btn.innerHTML !== correct) btn.innerHTML = correct; };
+            normalize();
+            const observer = new MutationObserver(normalize);
+            observer.observe(btn, { childList: true, characterData: true, subtree: true });
+        });
+    </script>
+</body>
+</html>
