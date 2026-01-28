@@ -19,13 +19,13 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow CORS for all routes
 app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
-app.config['UPLOAD_FOLDER'] = 'fotos_cadastro'
-app.config['FOTOS_INSUMOS_FOLDER'] = 'fotos_insumos'  # Nova pasta para fotos de insumos
+DATA_DIR = os.environ.get("DATA_DIR", "/data")
+app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, "fotos_cadastro")
+app.config['FOTOS_INSUMOS_FOLDER'] = os.path.join(DATA_DIR, "fotos_insumos")
+DATABASE = os.path.join(DATA_DIR, "gestao.db")
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB limit
 app.config['JSON_AS_ASCII'] = False  # garante acentuação correta no JSON
 app.config['JSONIFY_MIMETYPE'] = 'application/json; charset=utf-8'
-DATABASE = 'gestao.db'
-
 # Initialize SocketIO with eventlet
 socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*", logger=True, engineio_logger=True)
 
@@ -37,23 +37,31 @@ def allowed_file(filename):
 
 def get_db_connection():
     try:
-        conn = sqlite3.connect(DATABASE)
+        conn = sqlite3.connect(DATABASE, check_same_thread=False)
         conn.row_factory = sqlite3.Row
         conn.text_factory = str  # garante unicode
         return conn
     except sqlite3.Error as e:
         logger.error(f"Error connecting to database: {str(e)}")
         raise
-    
+
+
 import shutil
 
-DB_SRC = "gestao.db"
-DB_DST = "/data/gestao.db"
+DB_DST = DATABASE  # já é /data/gestao.db
 
+# garante que /data existe (quando volume estiver montado)
+os.makedirs(os.path.dirname(DB_DST), exist_ok=True)
+
+# se existe um DB no repo e ainda não existe DB persistente, copia
+DB_SRC = os.path.join(app.root_path, "gestao.db")
 if os.path.exists(DB_SRC) and not os.path.exists(DB_DST):
     shutil.copy(DB_SRC, DB_DST)
 
-os.chdir("/data")
+# garante pastas de fotos
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['FOTOS_INSUMOS_FOLDER'], exist_ok=True)
+
 
 def init_db():
     with db_lock:
