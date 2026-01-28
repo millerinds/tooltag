@@ -1,0 +1,7 @@
+.github
+.git
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db-journal
