@@ -44,6 +44,16 @@ def get_db_connection():
     except sqlite3.Error as e:
         logger.error(f"Error connecting to database: {str(e)}")
         raise
+    
+import shutil
+
+DB_SRC = "gestao.db"
+DB_DST = "/data/gestao.db"
+
+if os.path.exists(DB_SRC) and not os.path.exists(DB_DST):
+    shutil.copy(DB_SRC, DB_DST)
+
+os.chdir("/data")
 
 def init_db():
     with db_lock:
@@ -2341,16 +2351,12 @@ def guess_local_ip():
 if __name__ == '__main__':
     init_db()
     host = '0.0.0.0'
-    port = 5000
+    port = int(os.environ.get("PORT", 8080))
 
-    print(f"Local:   http://127.0.0.1:{port}")
-    ip = guess_local_ip()
-    if ip and ip not in ('127.0.0.1', '0.0.0.0'):
-        print(f"Na rede: http://{ip}:{port}")
-    else:
-        print("Na rede: não consegui detectar o IP automaticamente. Use o IP do 'ipconfig'.")
+    print(f"Running on {host}:{port}")
 
-    # Evita duplicar prints em modo debug no Windows
-    socketio.run(app, host=host, port=port, debug=True, use_reloader=False)
+    socketio.run(app, host=host, port=port, debug=False, use_reloader=False)
+
+
 
 
